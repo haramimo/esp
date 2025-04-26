@@ -1764,24 +1764,29 @@ Environment.UnwrapObject = UtilityFunctions.UnwrapObject -- (<Instance/string> O
 
 Environment.RenderCrosshair = CreatingFunctions.Crosshair -- (<void>) => <void>
 
-Environment.RemoveCrosshair = function() -- (<void>) => <void>
-	if not CrosshairParts.LeftLine then
-		return
-	end
+Environment.RemoveCrossPair = function()
+    if not CrossPairParts.LeftLine then
+        return
+    end
 
-	local ServiceConnections = Environment.UtilityAssets.ServiceConnections
+    -- Ensure ServiceConnections exists
+    Environment.UtilityAssets = Environment.UtilityAssets or {}
+    Environment.UtilityAssets.ServiceConnections = Environment.UtilityAssets.ServiceConnections or {}
 
-	Disconnect(ServiceConnections.UpdateCrosshairProperties)
-	Disconnect(ServiceConnections.UpdateCrosshair)
+    -- Safely disconnect connections
+    if Environment.UtilityAssets.ServiceConnections.UpdateCrossPairProperties then
+        Disconnect(Environment.UtilityAssets.ServiceConnections.UpdateCrossPairProperties)
+    end
+    if Environment.UtilityAssets.ServiceConnections.UpdateCrossPair then
+        Disconnect(Environment.UtilityAssets.ServiceConnections.UpdateCrossPair)
+    end
 
-	for _, RenderObject in next, CrosshairParts do
- 	   if RenderObject and RenderObject.Remove then
-    	    pcall(RenderObject.Remove, RenderObject)
- 	   end
-	end
+    -- Remove rendered parts
+    for _, RenderObject in next, CrossPairParts do
+        pcall(RenderObject.Destroy, RenderObject) -- Use Destroy instead of Remove
+    end
 
-
-	CrosshairParts = {}
+    CrossPairParts = {}
 end
 
 Environment.WrapPlayers = LoadESP -- (<void>) => <void>
@@ -1823,7 +1828,7 @@ Environment.LoadConfiguration = function(self) -- METHOD | (<void>) => <void>
 				Data[#Data + 1] = ConfigLibrary:CloneTable(Configuration[Index])
 			end
 
-			self.UpdateConfiguration(unpack(Data))
+			self.UpdateConfiguration(unpack(Data))()
 		end)
 	end
 end
