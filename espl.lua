@@ -1764,29 +1764,50 @@ Environment.UnwrapObject = UtilityFunctions.UnwrapObject -- (<Instance/string> O
 
 Environment.RenderCrosshair = CreatingFunctions.Crosshair -- (<void>) => <void>
 
-Environment.RemoveCrossPair = function()
-    if not CrossPairParts.LeftLine then
+Environment.RemoveCrosshair = function()
+    if not CrosshairParts.LeftLine then
         return
     end
 
-    -- Ensure ServiceConnections exists
+    -- Ensure UtilityAssets exists
     Environment.UtilityAssets = Environment.UtilityAssets or {}
     Environment.UtilityAssets.ServiceConnections = Environment.UtilityAssets.ServiceConnections or {}
 
     -- Safely disconnect connections
-    if Environment.UtilityAssets.ServiceConnections.UpdateCrossPairProperties then
-        Disconnect(Environment.UtilityAssets.ServiceConnections.UpdateCrossPairProperties)
+    local connections = Environment.UtilityAssets.ServiceConnections
+    if connections.UpdateCrosshairProperties then
+        if connections.UpdateCrosshairProperties.Disconnect then
+            connections.UpdateCrosshairProperties:Disconnect()
+        end
+        connections.UpdateCrosshairProperties = nil
     end
-    if Environment.UtilityAssets.ServiceConnections.UpdateCrossPair then
-        Disconnect(Environment.UtilityAssets.ServiceConnections.UpdateCrossPair)
+    if connections.UpdateCrosshair then
+        if connections.UpdateCrosshair.Disconnect then
+            connections.UpdateCrosshair:Disconnect()
+        end
+        connections.UpdateCrosshair = nil
     end
 
     -- Remove rendered parts
-    for _, RenderObject in next, CrossPairParts do
-        pcall(RenderObject.Destroy, RenderObject) -- Use Destroy instead of Remove
+    for _, part in pairs(CrosshairParts) do
+        if part and part.Remove then
+            pcall(part.Remove, part)
+        end
     end
 
-    CrossPairParts = {}
+    -- Reset crosshair parts
+    CrosshairParts = {
+        OutlineLeftLine = nil,
+        OutlineRightLine = nil,
+        OutlineTopLine = nil,
+        OutlineBottomLine = nil,
+        OutlineCenterDot = nil,
+        LeftLine = nil,
+        RightLine = nil,
+        TopLine = nil,
+        BottomLine = nil,
+        CenterDot = nil
+    }
 end
 
 Environment.WrapPlayers = LoadESP -- (<void>) => <void>
