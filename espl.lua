@@ -1775,8 +1775,11 @@ Environment.RemoveCrosshair = function() -- (<void>) => <void>
 	Disconnect(ServiceConnections.UpdateCrosshair)
 
 	for _, RenderObject in next, CrosshairParts do
-		pcall(RenderObject.Remove, RenderObject)
+ 	   if RenderObject and RenderObject.Remove then
+    	    pcall(RenderObject.Remove, RenderObject)
+ 	   end
 	end
+
 
 	CrosshairParts = {}
 end
