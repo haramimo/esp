@@ -1741,10 +1741,6 @@ Environment.Exit = function(self) -- METHOD | (<void>) => <void>
 
 			Table = nil
 		end
-		print("ConfigLibrary =", ConfigLibrary)
-print("LoadConfig =", ConfigLibrary and ConfigLibrary.LoadConfig)
-print("Path =", self and self.DeveloperSettings and self.DeveloperSettings.Path)
-
 
 		for Index, _ in next, Environment do
 			getgenv().ExunysDeveloperESP[Index] = nil
